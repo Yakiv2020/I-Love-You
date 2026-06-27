@@ -51,18 +51,18 @@ function getDeviceConfig() {
   };
 }
 
-  if (w < 1024) {
-    return {
-      centerY: 0.31,
-      scale: 38,
-      heartCount: 140,
-      fontSize: 76,
-      textY: 0.82,
-      textGap: 8,
-      textHeartSizeMin: 5,
-      textHeartSizeMax: 7
-    };
-  }
+ if (w < 600) {
+  return {
+    centerY: 0.26,
+    scale: 42,
+    heartCount: 110,
+    fontSize: 34,
+    textY: 0.74,
+    textGap: 5,
+    textHeartSizeMin: 3,
+    textHeartSizeMax: 4.5
+  };
+}
 
   return {
     centerY: 0.33,
