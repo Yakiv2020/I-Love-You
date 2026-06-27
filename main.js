@@ -35,6 +35,46 @@ function easeInOutQuad(t) {
     ? 2 * t * t
     : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
+function getDeviceConfig() {
+  const w = canvas.width;
+
+  if (w < 600) {
+  return {
+    centerY: 0.28,
+    scale: 38,
+    heartCount: 120,
+    fontSize: 48,
+    textY: 0.78,
+    textGap: 6,
+    textHeartSizeMin: 4,
+    textHeartSizeMax: 6
+  };
+}
+
+  if (w < 1024) {
+    return {
+      centerY: 0.31,
+      scale: 38,
+      heartCount: 140,
+      fontSize: 76,
+      textY: 0.82,
+      textGap: 8,
+      textHeartSizeMin: 5,
+      textHeartSizeMax: 7
+    };
+  }
+
+  return {
+    centerY: 0.33,
+    scale: 42,
+    heartCount: 160,
+    fontSize: 125,
+    textY: 0.88,
+    textGap: 10,
+    textHeartSizeMin: 6,
+    textHeartSizeMax: 9
+  };
+}
 
 function drawHeart(x, y, size, color, alpha = 1, angle = 0, glow = 15) {
   ctx.save();
@@ -89,10 +129,12 @@ function bezierPoint(start, control, end, t) {
 function createHearts() {
   hearts.length = 0;
 
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height * 0.33;
-  const scale = Math.min(canvas.width, canvas.height) / 42;
-  const count = 160;
+  const config = getDeviceConfig();
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height * config.centerY;
+const scale = Math.min(canvas.width, canvas.height) / config.scale;
+const count = config.heartCount;
 
   for (let i = 0; i < count; i++) {
     const t = (Math.PI * 2 * i) / count;
@@ -172,13 +214,19 @@ function getTextPoints() {
   tempCtx.fillStyle = "white";
   tempCtx.textAlign = "center";
   tempCtx.textBaseline = "middle";
-  tempCtx.font = "bold 125px Arial";
+  const config = getDeviceConfig();
 
-  tempCtx.fillText(TEXT, canvas.width / 2, canvas.height * 0.88);
+tempCtx.font = `bold ${config.fontSize}px Arial`;
+
+tempCtx.fillText(
+  TEXT,
+  canvas.width / 2,
+  canvas.height * config.textY
+);
 
   const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
   const points = [];
-  const gap = 10;
+  const gap = config.textGap;
 
   for (let y = 0; y < canvas.height; y += gap) {
     for (let x = 0; x < canvas.width; x += gap) {
@@ -284,7 +332,8 @@ function updateHeart(heart) {
       frame > heartReadyFrame + 40
     ) {
       const dx = heart.baseX - canvas.width / 2;
-      const dy = heart.baseY - canvas.height * 0.33;
+      const config = getDeviceConfig();
+      const dy = heart.baseY - canvas.height * config.centerY;
       const beat = heartbeat(frame - heartReadyFrame) * 0.06;
 
       heart.x = heart.baseX + dx * beat;
@@ -388,6 +437,7 @@ const drawSize =
 function startReleaseHearts() {
   const mainHearts = hearts.filter(heart => !heart.released);
   const releaseStartFrame = frame;
+  const config = getDeviceConfig();
 
   for (let i = 0; i < textPoints.length; i++) {
     const original = mainHearts[Math.floor(random(0, mainHearts.length))];
@@ -416,7 +466,7 @@ function startReleaseHearts() {
       releaseControlX: (original.x + target.x) / 2 + random(-120, 120),
       releaseControlY: (original.y + target.y) / 2 + random(-160, 60),
 
-      size: random(6, 9),
+      size: random(config.textHeartSizeMin, config.textHeartSizeMax),
       trail: [],
       trailLimit: 5
     });
@@ -437,11 +487,15 @@ function drawTextGlow() {
   ctx.shadowBlur = 35;
   ctx.fillStyle = "rgba(255, 0, 0, 0.18)";
 
-  ctx.font = "bold 125px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  const config = getDeviceConfig();
 
-  ctx.fillText(TEXT, canvas.width / 2, canvas.height * 0.88);
+ctx.font = `bold ${config.fontSize}px Arial`;
+
+ctx.fillText(
+  TEXT,
+  canvas.width / 2,
+  canvas.height * config.textY
+);
 
   ctx.restore();
 }
@@ -643,7 +697,15 @@ function drawFinalShine() {
   ctx.shadowBlur = 25;
 
   ctx.beginPath();
-  ctx.arc(canvas.width / 2, canvas.height * 0.88, 4, 0, Math.PI * 2);
+ const config = getDeviceConfig();
+
+ctx.arc(
+  canvas.width / 2,
+  canvas.height * config.textY,
+  4,
+  0,
+  Math.PI * 2
+);
   ctx.fill();
 
   ctx.restore();
